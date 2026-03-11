@@ -1,7 +1,7 @@
 from pathlib import Path
 import pandas as pd
 from datetime import datetime
-from calculate_scores import calculate_scores
+from leaderboard.calculate_scores import calculate_scores
 
 SUBMISSIONS_DIR = Path(__file__).resolve().parent.parent / "submissions"
 
