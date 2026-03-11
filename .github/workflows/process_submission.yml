@@ -1,6 +1,6 @@
 name: Process Secure Submission
 
-# Trigger on PUSH to main and on PR events
+# Trigger on PUSH to main, PR events, or manual run
 on:
   push:
     branches:
@@ -23,11 +23,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
-      - name: Checkout Repository
+      # 1️⃣ Checkout repository (PR-aware)
+      - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          ref: ${{ github.event.inputs.pr_number && 'refs/pull/' + github.event.inputs.pr_number + '/head' || github.head_ref }}
+          fetch-depth: 0
 
       # 2️⃣ Setup Python
       - name: Set up Python
@@ -35,20 +36,26 @@ jobs:
         with:
           python-version: '3.x'
 
-      # 3️⃣ Install dependencies and cryptography explicitly
+      # 3️⃣ Install dependencies
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install --upgrade cryptography
 
-      # 4️⃣ Optional: Verify cryptography installation
+      # 4️⃣ Optional: Verify cryptography
       - name: Verify cryptography
         run: |
           python -m pip show cryptography
           python -c "from cryptography.hazmat.primitives import serialization, hashes; print('cryptography OK')"
 
-      # 5️⃣ Run the submission processing script
+      # 5️⃣ Debug: list submissions folder
+      - name: List submissions folder
+        run: |
+          echo "DEBUG: Listing submissions folder contents:"
+          ls -R submissions || echo "No submissions found"
+
+      # 6️⃣ Run the submission processing script
       - name: Decrypt, Score, and Update Leaderboard
         env:
           SUBMISSION_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
@@ -57,7 +64,7 @@ jobs:
           echo "Decrypting and scoring submissions..."
           python .github/scripts/process_submission.py
 
-      # 6️⃣ Commit and push any changes only for pushes to main
+      # 7️⃣ Commit and push any changes only for pushes to main
       - name: Commit and Push Changes (Main branch only)
         if: github.event_name == 'push'
         run: |
