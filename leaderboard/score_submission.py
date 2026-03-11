@@ -1,14 +1,16 @@
+# scripts/score_submission.py
 import argparse
 import json
 from pathlib import Path
 import sys
 
-# Add current directory to sys.path for imports
+# Add parent directory to sys.path to allow importing leaderboard.calculate_scores
 sys.path.append(str(Path(__file__).parent.resolve()))
-from calculate_scores import calculate_scores
+from leaderboard.calculate_scores import calculate_scores  # absolute import
 
 
 def validate_metadata(submission_path: Path) -> None:
+    """Ensure metadata.json exists next to the submission CSV and is valid JSON."""
     metadata_path = submission_path.parent / "metadata.json"
     if not metadata_path.exists():
         raise FileNotFoundError(f"Missing metadata.json next to {submission_path.name}")
@@ -22,13 +24,13 @@ def validate_metadata(submission_path: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Score a single submission file.")
     parser.add_argument(
-        "submission_path", 
-        help="Path to predictions.csv"
+        "submission_path",
+        help="Path to predictions CSV (e.g., ideal_submissions.csv or perturbed_submission.csv)"
     )
     parser.add_argument(
-        "--require-metadata", 
-        action="store_true", 
-        help="Require metadata.json next to predictions.csv"
+        "--require-metadata",
+        action="store_true",
+        help="Require metadata.json next to the submission CSV"
     )
     args = parser.parse_args()
 
@@ -37,6 +39,8 @@ def main() -> None:
         validate_metadata(submission_path)
 
     scores = calculate_scores(submission_path)
+
+    # Output JSON so update_leaderboard.py can read it
     print(json.dumps(scores))
 
 
