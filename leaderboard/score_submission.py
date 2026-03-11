@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 from pathlib import Path
 from leaderboard.calculate_scores import calculate_scores_pair
@@ -21,9 +20,7 @@ def score():
         df = pd.DataFrame(columns=[
             "validation_f1_ideal",
             "validation_f1_perturbed",
-            "robustness_gap",
-            "validation_accuracy_ideal",
-            "validation_accuracy_perturbed"
+            "robustness_gap"
         ])
     else:
         df = pd.read_csv(leaderboard_file)
@@ -31,9 +28,7 @@ def score():
     new_row = {
         "validation_f1_ideal": scores["validation_f1_ideal"],
         "validation_f1_perturbed": scores["validation_f1_perturbed"],
-        "robustness_gap": scores["robustness_gap"],
-        "validation_accuracy_ideal": scores["validation_accuracy_ideal"],
-        "validation_accuracy_perturbed": scores["validation_accuracy_perturbed"]
+        "robustness_gap": scores["robustness_gap"]
     }
 
     df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
