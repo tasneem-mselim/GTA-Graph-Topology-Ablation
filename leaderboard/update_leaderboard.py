@@ -5,14 +5,14 @@ import subprocess
 import json
 import sys
 
-# Repo root
 repo_root = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(repo_root))
 
-from encryption.decrypt import decrypt_file  # adjust for top-level encryption folder
+from encryption.decrypt import decrypt_file
+from leaderboard.calculate_scores import calculate_scores
 
-SUBMISSIONS_DIR = Path("submissions")
-LEADERBOARD_CSV = Path(__file__).resolve().parent / "leaderboard.csv"
+SUBMISSIONS_DIR = repo_root / "submissions"
+LEADERBOARD_CSV = repo_root / "leaderboard/leaderboard.csv"
 
 def get_leaderboard_data():
     leaderboard = []
@@ -23,6 +23,7 @@ def get_leaderboard_data():
 
         ideal_enc = team_dir / "ideal.enc"
         pert_enc = team_dir / "perturbed.enc"
+
         if not ideal_enc.exists() or not pert_enc.exists():
             print(f"Skipping {team_dir.name}: missing files")
             continue
@@ -76,7 +77,9 @@ def update_leaderboard_csv():
         return
 
     df = pd.DataFrame(leaderboard_data)
-    df = df.sort_values(["validation_f1_perturbed", "robustness_gap"], ascending=[False, True]).reset_index(drop=True)
+    df = df.sort_values(
+        ["validation_f1_perturbed", "robustness_gap"], ascending=[False, True]
+    ).reset_index(drop=True)
     df.insert(0, "rank", range(1, len(df) + 1))
     df.to_csv(LEADERBOARD_CSV, index=False)
     print(f"Updated leaderboard at {LEADERBOARD_CSV}")
