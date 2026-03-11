@@ -1,7 +1,10 @@
-import pandas as pd
+import sys
 from pathlib import Path
-from leaderboard.calculate_scores import calculate_scores_pair
 
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+import pandas as pd
+from leaderboard.calculate_scores import calculate_scores_pair
 
 def score():
 
