@@ -113,11 +113,11 @@ Create a Python virtual environment and install dependencies:
 
 ```
 Starter Code
-A baseline GIN model is provided in starter_code/baseline.py. You can modify it or build your own model. The script:
+A baseline GIN model is provided in starter_code/baseline.py. You can modify it or build your own model. 
 ```
+The script Loads the MUTAG dataset:
 
-Loads the MUTAG dataset.
-
+```
 Reads train.csv and test.csv.
 
 Trains on clean graphs.
@@ -125,6 +125,7 @@ Trains on clean graphs.
 Generates predictions for both ideal and perturbed test graphs.
 
 Saves submission files in the required format.
+```
 
 To run the baseline:
 
